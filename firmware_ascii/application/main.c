@@ -14,7 +14,8 @@ volatile u32 G_u32SystemTime1ms = 0;                   /*!< @brief Global system
 volatile u32 G_u32SystemTime1s = 0;                    /*!< @brief Global system time incremented every second, max 2^32 (~136 years) */
 volatile u32 G_u32SystemFlags = 0;                     /*!< @brief Global system flags */
 volatile u32 G_u32ApplicationFlags = 0;                /*!< @brief Global system application flags: set when application is successfully initialized */
-u32 u32UselessVariableForExample;
+u16 u16NumBit1;
+u16 u16NumBit2;
 /*--------------------------------------------------------------------------------------------------------------------*/
 /* External global variables defined in other files (must indicate which file they are defined in) */
 
@@ -41,8 +42,11 @@ the 1ms period.
 
 void main(void)
 {
-  G_u32SystemFlags |= _SYSTEM_INITIALIZING;
-  u32UselessVariableForExample = 0;
+  //G_u32SystemFla gs |= _SYSTEM_INITIALIZING;
+  u16NumBit1 = 0xA5;
+  u16NumBit2 = 0xA5;
+  DrinkType aeDrinkArray1[] = {BEER,SHOOTER};
+  DrinkType aeDrinkArray2[] = {WINE,HIBALL};
   /* Low level initialization */
   WatchDogSetup(); /* During development, does not reset processor if timeout */
   GpioSetup();
@@ -85,9 +89,10 @@ void main(void)
   {
     WATCHDOG_BONE();
     SystemTimeCheck();
-    u32UselessVariableForExample++;
     /* Drivers */
     LedUpdate();
+    u16NumBit1 &=~_BIT3;
+    u16NumBit2 |=_BIT3;
     ButtonRunActiveState();
     UartRunActiveState();
     TimerRunActiveState(); 

@@ -25,6 +25,8 @@ FIRMWARE_SUB_REV1: should be updated when a pull request is made to the MASTER b
 /***********************************************************************************************************************
 * Constant Definitions
 ***********************************************************************************************************************/
+typedef enum {EMPTY1,BEER,SHOOTER,WINE,HIBALL}DrinkType;
+#define _BIT3 0x04;
 /* G_u32ApplicationFlags */
 /* The order of these flags corresponds to the order of applications in SystemStatusReport() (debug.c) */
 #define _APPLICATION_FLAGS_LED          0x00000001        /*!< G_u32ApplicationFlags LedStateMachine */
