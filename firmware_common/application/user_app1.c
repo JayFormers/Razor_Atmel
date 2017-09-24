@@ -414,8 +414,8 @@ static void UserApp1SM_Idle(void)
               u16Time=0;
           }
       }
+  
   }
-
 } /* end UserApp1SM_Idle() */
 
 
