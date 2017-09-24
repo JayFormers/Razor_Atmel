@@ -304,22 +304,120 @@ static void UserApp1SM_AntConfigureSlave(void)
 
 @brief Wait for the user to press BUTTON0 to start search mode
 */
+static void UserApp1SM_state1(void)
+{
+  u8 au8State1[] = "STATE 1";
+  
+  DebugPrintf("\n\rEntering state 1\n\r");
+  LCDMessage(LINE1_START_ADDR, au8State1);
+  LCDClearChars(LINE1_START_ADDR+7, 13);
+  LCDClearChars(LINE2_START_ADDR, 20);
+  LedOff(GREEN);
+  LedOff(YELLOW);
+  LedOff(ORANGE);
+  LedOff(RED);
+  LedOn(WHITE);
+  LedOn(PURPLE);
+  LedOn(BLUE);
+  LedOn(CYAN);
+  LedOn(LCD_RED);
+  LedOff(LCD_GREEN);
+  LedOn(LCD_BLUE);
+}
+
+static void UserApp1SM_state2(void)
+{
+  u8 au8State2[] = "STATE 2";
+  
+  DebugPrintf("\n\rEntering state 2\n\r");
+  LCDMessage(LINE1_START_ADDR, au8State2);
+  LCDClearChars(LINE1_START_ADDR+7, 13);
+  LCDClearChars(LINE2_START_ADDR, 20);
+  LedOff(WHITE);
+  LedOff(PURPLE);
+  LedOff(BLUE);
+  LedOff(CYAN);
+  LedOn(LCD_RED);
+  LedBlink(GREEN, LED_1HZ);
+  LedBlink(YELLOW, LED_2HZ);
+  LedBlink(ORANGE, LED_4HZ);
+  LedBlink(RED, LED_8HZ);
+  LedOn(LCD_RED);
+  LedOff(LCD_BLUE);
+  LedPWM(LCD_GREEN,LED_PWM_20);
+}
+
 static void UserApp1SM_Idle(void)
 {
-  /* Write the one line of code to use the BUTTON API to check if BUTTON0 was pressed */ 
-  if(WasButtonPressed(BUTTON0))
+  static u8 u8KeyValue=0;
+  static  u16 u16Time=0;
+  static  bool bIsOk=FALSE;
+  static u8 au8DebugScanf[2];
+  
+  if(DebugScanf(au8DebugScanf))
   {
-    ButtonAcknowledge(BUTTON0);
-    
-    /* Queue the Channel Open messages and then go to wait state */
-    AntOpenChannelNumber(ANT_CHANNEL_0);
-    AntOpenChannelNumber(ANT_CHANNEL_1);
-    
-    UserApp1_u32Timeout = G_u32SystemTime1ms;
-    UserApp1_StateMachine = UserApp1SM_OpeningChannels;    
+      switch(au8DebugScanf[0])
+      {
+          case '1':
+            u8KeyValue=1;
+            break;
+          case '2':
+            u8KeyValue=2;
+          default:
+            break;
+      }
+  }
+  
+  if( WasButtonPressed(BUTTON1) )
+  {
+      ButtonAcknowledge(BUTTON1);
+      u8KeyValue=1;
+  }
+  
+  if( WasButtonPressed(BUTTON2) )
+  {
+      ButtonAcknowledge(BUTTON2);
+      u8KeyValue=2;
+  }
+  
+  switch(u8KeyValue)
+  {
+      case 1:
+        bIsOk=FALSE;
+        UserApp1SM_state1();
+        PWMAudioOff(BUZZER1);
+        u8KeyValue=0;
+            break;
+            
+      case 2:
+        bIsOk=TRUE;
+        UserApp1SM_state2();
+        u8KeyValue=0;
+          break;
+       default:
+         break;
+  }
+  
+  if(bIsOk)
+  {
+      u16Time++;
+      if(u16Time>0&&u16Time<=100)
+      {
+          PWMAudioSetFrequency(BUZZER1, 200);
+          PWMAudioOn(BUZZER1);
+      }
+      else if(u16Time>100)
+      {
+          PWMAudioOff(BUZZER1);
+          if(u16Time==1000)
+          {
+              u16Time=0;
+          }
+      }
   }
 
 } /* end UserApp1SM_Idle() */
+
 
 
 /*!-------------------------------------------------------------------------------------------------------------------
